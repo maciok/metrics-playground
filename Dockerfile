@@ -1,7 +1,8 @@
 FROM openjdk:10.0.2-jdk
+ARG JAR_HOME
 
-
-ADD ${JAR_PATH:-build/libs/metrics-*.jar} /opt/system/
+RUN echo $JAR_HOME
+ADD ${JAR_HOME:-build/libs}/metrics-*.jar /opt/system/
 
 WORKDIR /opt/system
 
