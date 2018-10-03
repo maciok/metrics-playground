@@ -1,0 +1,68 @@
+buildscript {
+    ext {
+        springBootVersion = '2.0.5.RELEASE'
+        logbackVersion = '1.2.3'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'pl.pietrzam'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.10
+targetCompatibility = 1.10
+
+repositories {
+    mavenCentral()
+}
+
+group 'pl.pietrzam'
+description = 'Metrics'
+ext.vendor = 'Pietrzam'
+ext.buildInfo = [
+        name          : project.name,
+        version       : project.version,
+        description   : project.description,
+        vendor        : project.vendor,
+        buildDate     : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+        // Replace disallowed chars in docker tags with _
+        // Ref: https://github.com/moby/moby/blob/master/image/spec/v1.1.md
+        dockerImageTag: { project.version.toString().replaceAll(/[^a-zA-Z0-9_.-]/, '_') },
+]
+
+
+
+dependencies {
+    implementation('org.springframework.boot:spring-boot-starter-web')
+
+    compile 'org.apache.commons:commons-lang3:3.5'
+    compile 'commons-io:commons-io:2.5'
+    compileOnly 'org.projectlombok:lombok:1.18.2'
+
+    /* logback + json */
+    compile(group: "ch.qos.logback", name: 'logback-classic', version: logbackVersion) {
+        force = true
+    }
+    compile(group: "ch.qos.logback", name: 'logback-core', version: logbackVersion) {
+        force = true
+    }
+    compile group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.11'
+    compile group: 'org.codehaus.janino', name: 'janino', version: '3.0.8' // needed by conditionals
+    /* end logback + json */
+
+    testCompile 'org.codehaus.groovy:groovy-all:2.5.2'
+    testCompile 'org.spockframework:spock-core:1.2-groovy-2.5'
+    testCompile 'org.spockframework:spock-spring:1.2-groovy-2.5'
+
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+}

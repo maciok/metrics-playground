@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <contextName>${TRX_WORKER_APP:-worker}</contextName>
+
+    <!-- Note: this has performance impact but might be quite informative. Remove if it is a problem -->
+    <property name="AT_PATTERN" value="%C{1}:%L"/>
+    <property resource="build-info.properties"/>
+
+    <!--<if condition='!isDefined("LOG_DISABLE_STDOUT")'>-->
+    <!--<then>-->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${LOG_CONSOLE_LEVEL:-ALL}</level>
+        </filter>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %cn [%thread] %-5p %logger{1} - %m%n%xThrowable</pattern>
+        </encoder>
+    </appender>
+    <root>
+        <appender-ref ref="stdout"/>
+    </root>
+    <!--</then>-->
+    <!--</if>-->
+
+    <if condition='!isDefined("LOG_DISABLE_JSON")'>
+        <then>
+            <appender name="json" class="ch.qos.logback.core.FileAppender">
+                <file>${LOG_DESTINATION:-logs/application.json.log}</file>
+                <immediateFlush>true</immediateFlush>
+                <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <providers>
+                        <pattern>
+                            <!-- Align with awslogs timestamp format -->
+                            <pattern>
+                                {
+                                "timestamp": "%date{yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZ}",
+                                "level": "%level",
+                                "message": "%message",
+                                "app": "%cn",
+                                "logger": "%logger",
+                                "at": "${AT_PATTERN}",
+                                "thread": "%thread",
+                                "exception": "%throwable",
+                                "breadcrumbId": "%mdc{camel.breadcrumbId}",
+                                "routeId": "%mdc{camel.routeId}",
+                                "relmilis": "%r",
+                                "version": "${version}",
+                                "build": "${build.date} \\(${vcs.ref}\\)"
+                                }
+                            </pattern>
+                        </pattern>
+                        <tags>
+                            <fieldName>tags</fieldName>
+                        </tags>
+                    </providers>
+                </encoder>
+            </appender>
+            <root>
+                <appender-ref ref="json"/>
+            </root>
+        </then>
+    </if>
+
+    <logger name="org.springframework" level="warn"/>
+    <logger name="pl.pietrzam.metrics" level="info"/>
+    <!--<logger name="org.hibernate.SQL" level="warn"/>-->
+    <!--<logger name="org.apache.camel" level="warn"/>-->
+    <!--<logger name="org.apache.camel.impl.DefaultShutdownStrategy" level="warn"/>-->
+    <!--<logger name="org.eclipse.jetty" level="warn"/>-->
+    <!--<logger name="org.apache.camel.component.mail" level="debug"/>-->
+
+    <root level="${LOG_LEVEL:-INFO}"/>
+</configuration>
