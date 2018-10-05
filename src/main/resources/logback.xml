@@ -22,6 +22,14 @@
     <!--</then>-->
     <!--</if>-->
 
+    <appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${LOGSTASH_HOST:-127.0.0.1:5000}</destination>
+
+        <!-- encoder is required -->
+        <encoder class="net.logstash.logback.encoder.LogstashAccessEncoder" />
+    </appender>
+
+
     <if condition='!isDefined("LOG_DISABLE_JSON")'>
         <then>
             <appender name="json" class="ch.qos.logback.core.FileAppender">
