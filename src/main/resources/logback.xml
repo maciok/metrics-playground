@@ -6,8 +6,6 @@
     <property name="AT_PATTERN" value="%C{1}:%L"/>
     <property resource="build-info.properties"/>
 
-    <!--<if condition='!isDefined("LOG_DISABLE_STDOUT")'>-->
-    <!--<then>-->
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>${LOG_CONSOLE_LEVEL:-ALL}</level>
@@ -16,17 +14,37 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %cn [%thread] %-5p %logger{1} - %m%n%xThrowable</pattern>
         </encoder>
     </appender>
-    <root>
-        <appender-ref ref="stdout"/>
-    </root>
-    <!--</then>-->
-    <!--</if>-->
 
     <appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>${LOGSTASH_HOST:-127.0.0.1:5000}</destination>
-
         <!-- encoder is required -->
-        <encoder class="net.logstash.logback.encoder.LogstashAccessEncoder" />
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <!-- @todo Maybe I don't need every field? -->
+            <providers>
+                <mdc/>
+                <context/>
+                <version/>
+                <logLevel/>
+                <loggerName/>
+
+                <pattern>
+                    <pattern>
+                        {
+                        "appName": "elk-testdata",
+                        "appVersion": "1.0"
+                        }
+                    </pattern>
+                </pattern>
+
+                <threadName/>
+                <message/>
+
+                <logstashMarkers/>
+                <arguments/>
+
+                <stackTrace/>
+            </providers>
+        </encoder>
     </appender>
 
 
@@ -77,5 +95,9 @@
     <!--<logger name="org.eclipse.jetty" level="warn"/>-->
     <!--<logger name="org.apache.camel.component.mail" level="debug"/>-->
 
-    <root level="${LOG_LEVEL:-INFO}"/>
+    <root level="${LOG_LEVEL:-INFO}">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="stash"/>
+    </root>
+
 </configuration>
