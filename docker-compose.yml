@@ -63,6 +63,20 @@ services:
     command: ["./wait-for-it.sh", "-t", "60", "$LOGSTASH_HOST", "--", "./start.sh"]
     networks:
       - elk
+      
+  prometheus:
+    build:
+      context: ./docker/prometheus
+      args:
+        PROMETHEUS_VER: $PROMETHEUS_VER
+    environment:
+    - LOGSTASH_HOST= $LOGSTASH_HOST
+    ports:
+    - "9090:9090"
+    depends_on:
+    - metrics-app
+    networks:
+    - elk
 
 networks:
   elk:
