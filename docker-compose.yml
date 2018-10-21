@@ -15,7 +15,7 @@ services:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
     - elk
-  
+
   logstash:
     build:
       context: docker/logstash/
@@ -47,7 +47,7 @@ services:
     - elk
     depends_on:
     - elasticsearch
-  
+
   metrics-app:
     build:
       context: ./
@@ -55,15 +55,15 @@ services:
         JAR_HOME: build/libs
         RUN_SCRIPT: docker/app
     environment:
-      - LOGSTASH_HOST= $LOGSTASH_HOST
+    - LOGSTASH_HOST= $LOGSTASH_HOST
     ports:
-      - "8080:8080"
+    - "8080:8080"
     depends_on:
     - logstash
     command: ["./wait-for-it.sh", "-t", "60", "$LOGSTASH_HOST", "--", "./start.sh"]
     networks:
-      - elk
-      
+    - elk
+
   prometheus:
     build:
       context: ./docker/prometheus
@@ -75,6 +75,18 @@ services:
     - "9090:9090"
     depends_on:
     - metrics-app
+    networks:
+    - elk
+
+  grafana:
+    build:
+      context: ./docker/grafana
+      args:
+        GRAFANA_VER: $GRAFANA_VER
+    environment:
+    - GRAFANA_VER= $GRAFANA_VER
+    ports:
+    - "3000:3000"
     networks:
     - elk
 

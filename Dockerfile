@@ -3,9 +3,6 @@ FROM openjdk:10.0.2-jdk
 ARG JAR_HOME
 ARG RUN_SCRIPT
 
-# DEBUG
-RUN echo $JAR_HOME
-#
 
 ADD ${JAR_HOME:-build/libs}/metrics-*.jar /opt/system/
 ADD ${RUN_SCRIPT:-docker/app/*} /opt/system/
