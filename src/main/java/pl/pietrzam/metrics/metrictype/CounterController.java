@@ -1,19 +1,21 @@
-package pl.pietrzam.metrics;
+package pl.pietrzam.metrics.metrictype;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
-class LogEndpoint { // @todo create real live example
+@AllArgsConstructor
+class CounterController {
 
-    @PostMapping("/message")
+    private final CounterHolder counterHolder;
+    
+    @PostMapping("/counter/{counterType}")
     @ResponseBody
-    String storeLog(@RequestBody String message) {
-        log.info(message);
-        return "OK";
+    double increment(@PathVariable String counterType) {
+        final double count = counterHolder.increment(counterType);
+        return count;
     }
 }
