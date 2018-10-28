@@ -55,7 +55,9 @@ services:
         JAR_HOME: build/libs
         RUN_SCRIPT: docker/app
     environment:
-    - LOGSTASH_HOST= $LOGSTASH_HOST
+    - LOGSTASH_HOST
+    - LOG_ENABLE_STASH
+    - LOG_ENABLE_JSON
     ports:
     - "8080:8080"
     depends_on:
@@ -70,7 +72,7 @@ services:
       args:
         PROMETHEUS_VER: $PROMETHEUS_VER
     environment:
-    - LOGSTASH_HOST= $LOGSTASH_HOST
+    - LOGSTASH_HOST
     ports:
     - "9090:9090"
     depends_on:
@@ -84,7 +86,7 @@ services:
       args:
         GRAFANA_VER: $GRAFANA_VER
     environment:
-    - GRAFANA_VER= $GRAFANA_VER
+    - GRAFANA_VER
     ports:
     - "3000:3000"
     networks:

@@ -15,40 +15,47 @@
         </encoder>
     </appender>
 
-    <appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>${LOGSTASH_HOST:-127.0.0.1:5000}</destination>
-        <!-- encoder is required -->
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <!-- @todo Maybe I don't need every field? -->
-            <providers>
-                <mdc/>
-                <context/>
-                <version/>
-                <logLevel/>
-                <loggerName/>
+    <if condition='isDefined("LOG_ENABLE_STASH")'>
+        <then>
+            <appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+                <destination>${LOGSTASH_HOST:-127.0.0.1:5000}</destination>
+                <!-- encoder is required -->
+                <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <!-- @todo Maybe I don't need every field? -->
+                    <providers>
+                        <mdc/>
+                        <context/>
+                        <version/>
+                        <logLevel/>
+                        <loggerName/>
 
-                <pattern>
-                    <pattern>
-                        {
-                        "appName": "elk-testdata",
-                        "appVersion": "1.0"
-                        }
-                    </pattern>
-                </pattern>
+                        <pattern>
+                            <pattern>
+                                {
+                                "appName": "elk-testdata",
+                                "appVersion": "1.0"
+                                }
+                            </pattern>
+                        </pattern>
 
-                <threadName/>
-                <message/>
+                        <threadName/>
+                        <message/>
 
-                <logstashMarkers/>
-                <arguments/>
+                        <logstashMarkers/>
+                        <arguments/>
 
-                <stackTrace/>
-            </providers>
-        </encoder>
-    </appender>
+                        <stackTrace/>
+                    </providers>
+                </encoder>
+            </appender>
+            <root>
+                <appender-ref ref="stash"/>
+            </root>
+        </then>
+    </if>
 
 
-    <if condition='!isDefined("LOG_DISABLE_JSON")'>
+    <if condition='isDefined("LOG_ENABLE_JSON")'>
         <then>
             <appender name="json" class="ch.qos.logback.core.FileAppender">
                 <file>${LOG_DESTINATION:-logs/application.json.log}</file>
@@ -89,15 +96,9 @@
 
     <logger name="org.springframework" level="warn"/>
     <logger name="pl.pietrzam.metrics" level="info"/>
-    <!--<logger name="org.hibernate.SQL" level="warn"/>-->
-    <!--<logger name="org.apache.camel" level="warn"/>-->
-    <!--<logger name="org.apache.camel.impl.DefaultShutdownStrategy" level="warn"/>-->
-    <!--<logger name="org.eclipse.jetty" level="warn"/>-->
-    <!--<logger name="org.apache.camel.component.mail" level="debug"/>-->
 
     <root level="${LOG_LEVEL:-INFO}">
         <appender-ref ref="stdout"/>
-        <appender-ref ref="stash"/>
     </root>
 
 </configuration>
